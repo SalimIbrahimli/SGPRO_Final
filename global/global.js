@@ -1,6 +1,5 @@
 // ==== AI CHAT WIDGET (global.js) ====
 document.addEventListener("DOMContentLoaded", () => {
-  // Bəzi səhifələrdə widget olmaya da bilər – səhv atmasın deyə check edirik
   const widget = document.querySelector(".ai-chat-widget");
   if (!widget) return;
 
@@ -15,28 +14,34 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Backend ünvanı (hal-hazırda lokalda işləyir)
   const API_URL = "http://localhost:3000/api/chat";
 
-  // Mesaj əlavə etmək üçün helper
+  // Mesaj əlavə etmək üçün helper (HTML dəstəyi)
   function addMessage(text, role = "assistant") {
     const msg = document.createElement("div");
     msg.className = "chat-msg" + (role === "user" ? " user" : "");
-    msg.textContent = text;
+    msg.innerHTML = text;
     chatBody.appendChild(msg);
     chatBody.scrollTop = chatBody.scrollHeight;
     return msg;
   }
 
-  // Açılışda ilk salam
+  // Açılış salamı
   if (!chatBody.dataset.initialized) {
     addMessage(
-      "Salam! Mən AzLand AI assistentiyəm. Mənə sual verə və ya səyahət planlaması üçün kömək istəyəsən. ✨"
+      `
+      <div class="ai-welcome-box">
+        <strong>✨ Salam! Mən <span style="color:#d8b4ff;">AzLand AI</span> assistentiyəm.</strong><br><br>
+        Sizə marşrut, turlar, qiymətlər və səyahət planlaması ilə bağlı kömək edə bilərəm.<br>
+        Sualınızı yazmağa başlaya bilərsiniz. 🌟
+      </div>
+    `,
+      "assistant"
     );
     chatBody.dataset.initialized = "true";
   }
 
-  // CHAT AÇ / BAĞLA
+  // Aç / bağla
   toggle.addEventListener("click", () => {
     widget.classList.toggle("open");
     if (widget.classList.contains("open")) {
@@ -48,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     widget.classList.remove("open");
   });
 
-  // Mesaj göndər funksiyası
+  // Mesaj göndər
   async function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
@@ -57,36 +62,34 @@ document.addEventListener("DOMContentLoaded", () => {
     addMessage(text, "user");
     input.value = "";
 
-    // "Yazır..." indikatoru
+    // "AI yazır..." indikatoru
     const typingMsg = addMessage("AI yazır...", "assistant");
 
     try {
       const res = await fetch(API_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text }),
       });
 
       if (!res.ok) {
-        throw new Error("Server error");
+        const errText = await res.text();
+        console.error("Server error:", res.status, errText);
+        throw new Error("Server error " + res.status);
       }
 
       const data = await res.json();
       typingMsg.textContent = data.reply || "Cavab ala bilmədim.";
     } catch (err) {
-      console.error(err);
+      console.error("Fetch/Gemini error:", err);
       typingMsg.textContent = "Xəta baş verdi. Bir az sonra yenidən yoxla.";
     }
 
     chatBody.scrollTop = chatBody.scrollHeight;
   }
 
-  // Button click
   sendBtn.addEventListener("click", sendMessage);
 
-  // Enter ilə göndərmə
   input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
