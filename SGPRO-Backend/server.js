@@ -1,4 +1,4 @@
-// server.js – Google Gemini backend
+// server.js – Google Gemini backend (Düzəldilmiş)
 
 import express from "express";
 import cors from "cors";
@@ -20,38 +20,82 @@ if (!apiKey) {
 
 console.log("✅ GEMINI_API_KEY tapıldı.");
 
-// Gemini client
+// Gemini client - DÜZƏLDİLMİŞ MODEL ADI
 const genAI = new GoogleGenerativeAI(apiKey);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-// və ya: const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
+// Doğru model adı: gemini-pro (və ya gemini-1.5-pro-latest)
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+console.log("✅ Gemini model yükləndi: gemini-pro");
 
 app.post("/api/chat", async (req, res) => {
-  const { message } = req.body;
-  console.log("➡️ Gələn mesaj:", message);
-
-  if (!message || typeof message !== "string") {
-    return res.status(400).json({ error: "message is required" });
-  }
-
   try {
-    const result = await model.generateContent(message);
-    const reply = result.response.text();
+    const { message } = req.body;
+    console.log("➡️ Gələn mesaj:", message);
 
-    console.log("⬅️ Gemini cavabı (ilk 80 simvol):", reply.slice(0, 80));
+    // Validasiya
+    if (!message || typeof message !== "string") {
+      console.error("❌ Mesaj düzgün deyil:", message);
+      return res
+        .status(400)
+        .json({ error: "Mesaj tələb olunur və string olmalıdır" });
+    }
+
+    if (message.trim().length === 0) {
+      console.error("❌ Boş mesaj göndərilib");
+      return res.status(400).json({ error: "Boş mesaj göndərilə bilməz" });
+    }
+
+    // Gemini-dən cavab al
+    console.log("🤖 Gemini-yə sorğu göndərilir...");
+    const result = await model.generateContent(message);
+    const response = await result.response;
+    const reply = response.text();
+
+    console.log("⬅️ Gemini cavabı (ilk 100 simvol):", reply.slice(0, 100));
+
     res.json({ reply });
   } catch (error) {
-    console.error("❌ Gemini API error:", error?.message || error);
-    res
-      .status(500)
-      .json({
-        error: "Gemini error",
-        details: String(error?.message || error),
-      });
+    console.error("❌ Server xətası:", error);
+
+    // Daha ətraflı xəta məlumatı
+    const errorDetails = {
+      message: error?.message || "Naməlum xəta",
+      type: error?.constructor?.name || "Error",
+      stack: process.env.NODE_ENV === "development" ? error?.stack : undefined,
+    };
+
+    console.error("Xəta detalları:", errorDetails);
+
+    res.status(500).json({
+      error: "Gemini API xətası",
+      details: errorDetails.message,
+      suggestion: "Gemini API key-in düzgündürmü? Model adı düzgündürmü?",
+    });
   }
+});
+
+// Test endpoint
+app.get("/api/test", (req, res) => {
+  res.json({
+    status: "ok",
+    message: "Backend işləyir!",
+    model: "gemini-pro",
+  });
+});
+
+// Root endpoint
+app.get("/", (req, res) => {
+  res.json({
+    message: "SG AI Backend",
+    endpoints: {
+      chat: "POST /api/chat",
+      test: "GET /api/test",
+    },
+  });
 });
 
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`🚀 AI server http://localhost:${PORT} ünvanında işləyir`);
+  console.log(`📝 Test üçün: http://localhost:${PORT}/api/test`);
 });
