@@ -1,0 +1,7 @@
+# ENV files
+*.env
+SGPRO-Backend/.env
+
+# Node
+node_modules/
+npm-debug.log
