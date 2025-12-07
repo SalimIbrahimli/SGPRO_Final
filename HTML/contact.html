@@ -30,10 +30,83 @@
 
     <a href="./contact.html" class="get-started-btn">Get Started</a>
   </header>
-  <!-- FOOTER -->
-  <!-- FOOTER -->
-  <!-- FOOTER -->
-  <!-- FOOTER -->
+
+  <!-- MAIN -->
+  <div class="container">
+    <div class="form-card">
+      <div class="success-message" id="successMessage">
+        Mesajınız uğurla göndərildi! Tezliklə sizinlə əlaqə saxlayacağıq.
+      </div>
+
+      <!-- FORM BURADA DƏYİŞİB -->
+      <form id="contactForm" action="../contact.php" method="POST">
+        <div class="form-group">
+          <label>Ad <span>*</span></label>
+          <input type="text" name="name" placeholder="Adınızı daxil edin" required>
+        </div>
+
+        <div class="form-group">
+          <label>Email <span>*</span></label>
+          <input type="email" name="email" placeholder="Email ünvanınızı daxil edin" required>
+        </div>
+
+        <div class="form-group">
+          <label>Mesaj <span>*</span></label>
+          <textarea name="message" placeholder="Mesajınızı yazın..." required></textarea>
+        </div>
+
+        <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <path d="M21 15l-5-5L5 21" />
+          </svg>
+          <div class="upload-text">Şəkil yığdaşdırın və ya KA Təhvil edin</div>
+          <div class="upload-subtext">PNG, JPG və ya PDF</div>
+          <input type="file" id="fileInput" style="display: none;" accept="image/*,.pdf">
+        </div>
+
+        <!-- SUBMIT DÜYMƏSİ: a yox, button -->
+        <button type="submit" class="submit-btn">
+          <svg viewBox="0 0 24 24">
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+          Göndər
+        </button>
+      </form>
+    </div>
+
+    <div class="contact-methods">
+      <div class="contact-card">
+        <svg viewBox="0 0 24 24">
+          <rect x="2" y="4" width="20" height="16" rx="2" />
+          <path d="M2 7l10 7 10-7" />
+        </svg>
+        <div class="contact-title">Email</div>
+        <div class="contact-info">info@example.az</div>
+      </div>
+
+      <div class="contact-card">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+        </svg>
+        <div class="contact-title">Telefon</div>
+        <div class="contact-info">+994 12 345 67 89</div>
+      </div>
+
+      <div class="contact-card">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
+        <div class="contact-title">Ünvan</div>
+        <div class="contact-info">Bakı, Azərbaycan</div>
+      </div>
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-content">
@@ -143,47 +216,10 @@
       </div>
     </div>
   </footer>
-  <!-- FOOTER FINISHES HERE -->
-  <!-- FOOTER FINISHES HERE -->
-  <!-- FOOTER FINISHES HERE -->
-  <!-- FOOTER FINISHES HERE -->
-  <!-- AI CHAT WIDGET -->
-  <div class="ai-chat-widget">
-    <button class="ai-chat-toggle" aria-label="Open AI chat">
-      <span class="ai-chat-icon">🤖</span>
-    </button>
 
-    <div class="ai-chat-window">
-      <div class="ai-chat-header">
-        <div class="ai-chat-title">
-          <span class="ai-chat-badge">AI</span>
-          <span>SG Assistant</span>
-        </div>
-        <button class="ai-chat-close" aria-label="Close chat">&times;</button>
-      </div>
-
-      <div class="ai-chat-body">
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          Maecenas at orci in lorem varius tincidunt.
-          (Buradakı mətni sonra öz mətninlə əvəz edərsən.)
-        </p>
-      </div>
-
-      <div class="ai-chat-footer">
-        <input type="text" placeholder="Type a message..." disabled />
-        <button disabled>Send</button>
-      </div>
-    </div>
-  </div>
-  <!-- /AI CHAT WIDGET -->
-  <!-- /AI CHAT WIDGET -->
-  <!-- /AI CHAT WIDGET -->
-  <!-- /AI CHAT WIDGET -->
-  <!-- /AI CHAT WIDGET -->
-  <!-- /AI CHAT WIDGET -->
   <script src="../SCRIPT/contact.js"></script>
   <script src="../SCRIPT/language.js"></script>
+  <script src="../global/global.js"></script>
 </body>
 
 </html>
