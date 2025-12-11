@@ -24,7 +24,7 @@
 .status-dot {
   width: 8px;
   height: 8px;
-  background: #34d399;
+  background: #45ffbb;
   border-radius: 50%;
   animation: pulse 2s ease-in-out infinite;
 }
