@@ -56,6 +56,7 @@ body::after {
     backdrop-filter: blur(20px);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     padding-right: 60px;
+    background: #0f142d;
 }
 
 .form-group {
@@ -212,6 +213,7 @@ textarea {
     text-align: center;
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
+    background-color: #0f142d;
 }
 
 .contact-card:hover {
@@ -267,4 +269,4 @@ textarea {
         opacity: 1;
         transform: translateY(0);
     }
-}
+}   

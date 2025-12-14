@@ -1,87 +1,92 @@
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("FAQ JS LOADED");
+
   const items = document.querySelectorAll(
     ".faq-question-item-container-wrapper"
   );
+  const searchInput = document.querySelector(".search-input-field-element");
 
+  // init: all closed + transition
+  items.forEach((item) => {
+    const panel = item.querySelector(".answer-content-collapsible-wrapper");
+    if (!panel) return;
+
+    panel.style.overflow = "hidden";
+    panel.style.maxHeight = "0px";
+    panel.style.transition = "max-height 0.45s ease";
+  });
+
+  const closeItem = (item) => {
+    item.classList.remove("active-expanded-state");
+    const panel = item.querySelector(".answer-content-collapsible-wrapper");
+    if (panel) panel.style.maxHeight = "0px";
+  };
+
+  const openItem = (item) => {
+    item.classList.add("active-expanded-state");
+    const panel = item.querySelector(".answer-content-collapsible-wrapper");
+    if (panel) panel.style.maxHeight = panel.scrollHeight + "px";
+  };
+
+  // click handlers
   items.forEach((item) => {
     const btn = item.querySelector(".question-button-trigger-element");
     const panel = item.querySelector(".answer-content-collapsible-wrapper");
-
     if (!btn || !panel) return;
 
-    // Başlanğıcda panel bağlı olsun
-    panel.style.maxHeight = "0px";
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
 
-    btn.addEventListener("click", () => {
       const isOpen = item.classList.contains("active-expanded-state");
 
-      // Hamısını bağla
+      // accordion: close others
       items.forEach((it) => {
-        it.classList.remove("active-expanded-state");
-        const p = it.querySelector(".answer-content-collapsible-wrapper");
-        if (p) p.style.maxHeight = "0px";
+        if (it !== item) closeItem(it);
       });
 
-      // Əgər bağlı idisə, aç
-      if (!isOpen) {
-        item.classList.add("active-expanded-state");
-        panel.style.maxHeight = panel.scrollHeight + "px";
-      }
+      // toggle current
+      if (isOpen) closeItem(item);
+      else openItem(item);
     });
   });
 
-  // Search funksiyası
-  const searchInput = document.querySelector(".search-input-field-element");
+  // search
   if (searchInput) {
     searchInput.addEventListener("input", () => {
       const query = searchInput.value.trim().toLowerCase();
 
       items.forEach((item) => {
-        const question =
+        const q =
           item
             .querySelector(".question-button-trigger-element")
             ?.textContent?.toLowerCase() || "";
-        const answer =
+        const a =
           item
             .querySelector(".answer-text-inner-content-element")
             ?.textContent?.toLowerCase() || "";
 
-        if (question.includes(query) || answer.includes(query)) {
-          item.style.display = "";
-        } else {
-          item.style.display = "none";
-        }
+        const match = q.includes(query) || a.includes(query);
+        item.style.display = match ? "" : "none";
+
+        // if hidden, close it
+        if (!match) closeItem(item);
       });
+
+      // keep open panel height correct
+      const activePanel = document.querySelector(
+        ".faq-question-item-container-wrapper.active-expanded-state .answer-content-collapsible-wrapper"
+      );
+      if (activePanel)
+        activePanel.style.maxHeight = activePanel.scrollHeight + "px";
     });
   }
-});
-document.addEventListener("DOMContentLoaded", () => {
-  const items = document.querySelectorAll(
-    ".faq-question-item-container-wrapper"
-  );
 
-  items.forEach((item) => {
-    const btn = item.querySelector(".question-button-trigger-element");
-    const panel = item.querySelector(".answer-content-collapsible-wrapper");
-
-    if (!btn || !panel) return;
-
-    // başlanğıcda bağlı
-    panel.style.maxHeight = "0px";
-
-    btn.addEventListener("click", () => {
-      const isOpen = panel.style.maxHeight !== "0px";
-
-      // hamısını bağla
-      items.forEach((i) => {
-        const p = i.querySelector(".answer-content-collapsible-wrapper");
-        if (p) p.style.maxHeight = "0px";
-      });
-
-      // yalnız klik olunanı aç
-      if (!isOpen) {
-        panel.style.maxHeight = panel.scrollHeight + "px";
-      }
-    });
+  // resize fix
+  window.addEventListener("resize", () => {
+    const activePanel = document.querySelector(
+      ".faq-question-item-container-wrapper.active-expanded-state .answer-content-collapsible-wrapper"
+    );
+    if (activePanel)
+      activePanel.style.maxHeight = activePanel.scrollHeight + "px";
   });
 });
