@@ -1,48 +1,80 @@
 <?php
-// Sadə contact form mail göndərmə skripti
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Content-Type');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+$to_email   = "info@example.com";
+$from_email = "noreply@example.com";
+$from_name  = "Website Contact Form";
 
-    // Form dəyərlərini götür
-    $name    = isset($_POST['name']) ? trim($_POST['name']) : '';
-    $email   = isset($_POST['email']) ? trim($_POST['email']) : '';
-    $message = isset($_POST['message']) ? trim($_POST['message']) : '';
+$json = file_get_contents('php://input');
+$data = json_decode($json, true);
 
-    // Sadə validasiya
-    if ($name === '' || $email === '' || $message === '') {
-        // Hər hansı input boşdursa error
-        header("Location: HTML/contact.html?status=error");
-        exit;
-    }
-
-    // BURANI DƏYİŞ: mesaj hara gəlsin?
-    $to = "imran.ibrahimov@gmail.com";  // <- ÖZ emailini yaz
-
-    $subject = "SGPRO saytından yeni əlaqə mesajı";
-
-    $body  = "Yeni mesaj göndərildi:\n\n";
-    $body .= "Ad: " . $name . "\n";
-    $body .= "Email: " . $email . "\n\n";
-    $body .= "Mesaj:\n" . $message . "\n";
-
-    // From/Reply-To header-lər
-    // From olaraq domenində olan mail yazsan daha stabil işləyər
-    $headers  = "From: noreply@senindomenin.com\r\n";
-    $headers .= "Reply-To: " . $email . "\r\n";
-    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
-
-    // Mail göndər
-    if (mail($to, $subject, $body, $headers)) {
-        // Uğurlu oldu → contact səhifəsinə qaytar + status
-        header("Location: HTML/contact.html?status=success");
-        exit;
-    } else {
-        // Xəta oldu
-        header("Location: HTML/contact.html?status=error");
-        exit;
-    }
+if (!is_array($data) || !isset($data['fullName'], $data['emailAddress'], $data['messageContent'])) {
+  echo json_encode(['success' => false, 'message' => 'Bütün məcburi xanaları doldurun']);
+  exit;
 }
 
-// Birbaşa bu fayla GET ilə girsələr, contact səhifəsinə qaytar
-header("Location: HTML/contact.html");
-exit;
+$fullName = htmlspecialchars(strip_tags($data['fullName']));
+$emailAddress = filter_var($data['emailAddress'], FILTER_SANITIZE_EMAIL);
+$companyName = isset($data['companyName']) ? htmlspecialchars(strip_tags($data['companyName'])) : 'N/A';
+$serviceInterested = isset($data['serviceInterested']) ? htmlspecialchars(strip_tags($data['serviceInterested'])) : 'N/A';
+$messageContent = htmlspecialchars(strip_tags($data['messageContent']));
+$timestamp = isset($data['timestamp']) ? $data['timestamp'] : date('Y-m-d H:i:s');
+
+if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
+  echo json_encode(['success' => false, 'message' => 'Düzgün email daxil edin']);
+  exit;
+}
+
+$subject = "Yeni mesaj: $fullName - Contact Form";
+
+$email_body = "
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='UTF-8' />
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #6c5dd3 0%, #8b5dd3 100%); color: white; padding: 20px; border-radius: 10px 10px 0 0; }
+    .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+    .field { margin-bottom: 20px; }
+    .field-label { font-weight: bold; color: #6c5dd3; }
+    .field-value { margin-top: 5px; padding: 10px; background: white; border-left: 3px solid #6c5dd3; }
+    .footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
+  </style>
+</head>
+<body>
+  <div class='container'>
+    <div class='header'><h2>🎉 Yeni Mesaj Alındı</h2></div>
+    <div class='content'>
+      <div class='field'><div class='field-label'>Ad Soyad:</div><div class='field-value'>$fullName</div></div>
+      <div class='field'><div class='field-label'>Email:</div><div class='field-value'><a href='mailto:$emailAddress'>$emailAddress</a></div></div>
+      <div class='field'><div class='field-label'>Şirkət:</div><div class='field-value'>$companyName</div></div>
+      <div class='field'><div class='field-label'>Maraq duyulan xidmət:</div><div class='field-value'>$serviceInterested</div></div>
+      <div class='field'><div class='field-label'>Mesaj:</div><div class='field-value'>$messageContent</div></div>
+      <div class='footer'>
+        <p>Göndərilmə tarixi: $timestamp</p>
+        <p>Bu mesaj website contact formundan göndərilib.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+";
+
+$headers  = "MIME-Version: 1.0\r\n";
+$headers .= "Content-type:text/html;charset=UTF-8\r\n";
+$headers .= "From: $from_name <$from_email>\r\n";
+$headers .= "Reply-To: $emailAddress\r\n";
+$headers .= "X-Mailer: PHP/" . phpversion();
+
+$mail_sent = mail($to_email, $subject, $email_body, $headers);
+
+if ($mail_sent) {
+  echo json_encode(['success' => true, 'message' => 'Mesajınız uğurla göndərildi']);
+} else {
+  echo json_encode(['success' => false, 'message' => 'Email göndərilmədi. Zəhmət olmasa yenidən cəhd edin.']);
+}
