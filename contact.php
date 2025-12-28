@@ -4,7 +4,7 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
-$to_email   = "info@example.com";
+$to_email   = "imran.ibrahimov@gmail.com";
 $from_email = "noreply@example.com";
 $from_name  = "Website Contact Form";
 
