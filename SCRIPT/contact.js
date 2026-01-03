@@ -181,7 +181,7 @@ class ContactFormController {
   }
 
   async sendToBackend(formData) {
-    const BACKEND_URL = "send-email.php";
+   const BACKEND_URL = "http://localhost:3000/api/contact";
 
     const response = await fetch(BACKEND_URL, {
       method: "POST",
