@@ -1,0 +1,4 @@
+backend-node/.env
+backend-node/leads.sqlite
+backend-node/node_modules/
+node_modules/
