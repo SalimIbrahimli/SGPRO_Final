@@ -34,15 +34,7 @@
     <script>
         const intro = document.getElementById("intro");
         const video = document.getElementById("introVideo");
-
-        video.addEventListener("ended", () => {
-            intro.style.opacity = "0";
-            intro.style.transition = "opacity 0.6s ease";
-
-            setTimeout(() => {
-                intro.remove();
-            }, 600);
-        });
+        
         video.addEventListener("ended", () => {
             intro.style.opacity = "0";
             intro.style.transition = "opacity 0.6s ease";
@@ -51,9 +43,8 @@
                 window.location.replace("HTML/home.html");
             }, 600);
         });
-
+        
     </script>
-
 </body>
 
 </html>
