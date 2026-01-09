@@ -1,3 +1,9 @@
+const EMAILJS_CONFIG = {
+  SERVICE_ID: "service_20pc38c", // ← EmailJS-dən Service ID
+  TEMPLATE_ID: "template_6wqnb15", // ← EmailJS-dən Template ID
+  PUBLIC_KEY: "tOylK2iNEjK1hlaTT", // ← EmailJS-dən Public Key
+};
+
 class ContactFormController {
   constructor(formSelector) {
     this.form = document.querySelector(formSelector);
@@ -32,13 +38,26 @@ class ContactFormController {
           minLength: "Mesaj ən azı 10 simvol olmalıdır",
         },
       },
+      companyName: { required: false },
+      serviceInterested: { required: false },
     };
 
     this.init();
   }
 
   init() {
-    if (!this.form) return;
+    if (!this.form) {
+      console.error("❌ Form tapılmadı!");
+      return;
+    }
+
+    if (typeof emailjs !== "undefined") {
+      emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+      console.log("✅ EmailJS yükləndi");
+    } else {
+      console.error("❌ EmailJS yüklənmədi!");
+    }
+
     this.bindEvents();
     this.setupRealTimeValidation();
   }
@@ -62,6 +81,10 @@ class ContactFormController {
       const field = this.form.querySelector(`[name="${fieldName}"]`);
       if (!field) return;
 
+      const rules = this.validationRules[fieldName];
+      const hasRules = rules?.required || rules?.minLength || rules?.pattern;
+      if (!hasRules) return;
+
       field.addEventListener("blur", () => {
         this.validateField(fieldName, field.value);
       });
@@ -81,18 +104,21 @@ class ContactFormController {
     const field = this.form.querySelector(`[name="${fieldName}"]`);
     const errorElement = this.form.querySelector(`[data-error="${fieldName}"]`);
 
-    if (rules.required && !value.trim()) {
-      this.showFieldError(field, errorElement, rules.errorMessages.required);
+    if (rules.required && !String(value || "").trim()) {
+      this.showFieldError(field, errorElement, rules.errorMessages?.required);
       return false;
     }
 
-    if (rules.minLength && value.trim().length < rules.minLength) {
-      this.showFieldError(field, errorElement, rules.errorMessages.minLength);
+    if (
+      rules.minLength &&
+      String(value || "").trim().length < rules.minLength
+    ) {
+      this.showFieldError(field, errorElement, rules.errorMessages?.minLength);
       return false;
     }
 
-    if (rules.pattern && !rules.pattern.test(value)) {
-      this.showFieldError(field, errorElement, rules.errorMessages.pattern);
+    if (rules.pattern && !rules.pattern.test(String(value || ""))) {
+      this.showFieldError(field, errorElement, rules.errorMessages?.pattern);
       return false;
     }
 
@@ -103,7 +129,7 @@ class ContactFormController {
   showFieldError(field, errorElement, message) {
     field?.classList.add("contact-form__input--error");
     if (errorElement) {
-      errorElement.textContent = message;
+      errorElement.textContent = message || "Xəta";
       errorElement.classList.add("contact-form__error-message--visible");
     }
   }
@@ -118,19 +144,21 @@ class ContactFormController {
 
   validateForm() {
     let isValid = true;
-
     Object.keys(this.validationRules).forEach((fieldName) => {
+      const rules = this.validationRules[fieldName];
+      const hasRules = rules?.required || rules?.minLength || rules?.pattern;
+      if (!hasRules) return;
+
       const field = this.form.querySelector(`[name="${fieldName}"]`);
       if (!field) return;
 
       const ok = this.validateField(fieldName, field.value);
       if (!ok) isValid = false;
     });
-
     return isValid;
   }
 
-  async handleSubmit() {
+  handleSubmit() {
     if (this.isSubmitting) return;
 
     if (!this.validateForm()) {
@@ -141,64 +169,68 @@ class ContactFormController {
       return;
     }
 
+    if (typeof emailjs === "undefined") {
+      console.error("❌ EmailJS yüklənməyib!");
+      this.showNotification("Texniki xəta. Yenidən cəhd edin.", "error");
+      return;
+    }
+
     this.isSubmitting = true;
     this.setLoadingState(true);
 
     const formData = {
-      fullName: this.form.fullName.value.trim(),
-      emailAddress: this.form.emailAddress.value.trim(),
-      companyName: this.form.companyName.value.trim(),
-      serviceInterested: this.form.serviceInterested.value,
-      messageContent: this.form.messageContent.value.trim(),
-      timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent,
-      language: navigator.language,
+      user_name: this.form.querySelector('[name="fullName"]')?.value || "",
+      user_email: this.form.querySelector('[name="emailAddress"]')?.value || "",
+      company:
+        this.form.querySelector('[name="companyName"]')?.value ||
+        "Qeyd edilməyib",
+      service:
+        this.form.querySelector('[name="serviceInterested"]')?.value ||
+        "Qeyd edilməyib",
+      message: this.form.querySelector('[name="messageContent"]')?.value || "",
     };
 
-    try {
-      const response = await this.sendToBackend(formData);
+    console.log("📤 Email göndərilir...", formData);
 
-      if (response.success) {
+    emailjs
+      .send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_ID,
+        formData,
+        EMAILJS_CONFIG.PUBLIC_KEY
+      )
+      .then((response) => {
+        console.log("✅ Email göndərildi:", response.status);
         this.showNotification(
-          "Mesajınız uğurla göndərildi! Tezliklə sizinlə əlaqə saxlayacağıq.",
+          "Mesajınız uğurla göndərildi! Tezliklə əlaqə saxlayacağıq.",
           "success"
         );
         this.form.reset();
-        this.trackConversion(formData);
-      } else {
-        throw new Error(response.message || "Xəta baş verdi");
-      }
-    } catch (error) {
-      console.error("Form submission error:", error);
-      this.showNotification(
-        "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.",
-        "error"
-      );
-    } finally {
-      this.isSubmitting = false;
-      this.setLoadingState(false);
-    }
-  }
-
-  async sendToBackend(formData) {
-   const BACKEND_URL = "http://localhost:3000/api/contact";
-
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
+        Object.keys(this.validationRules).forEach((fieldName) => {
+          const field = this.form.querySelector(`[name="${fieldName}"]`);
+          const errorElement = this.form.querySelector(
+            `[data-error="${fieldName}"]`
+          );
+          if (field && errorElement) {
+            this.clearFieldError(field, errorElement);
+          }
+        });
+      })
+      .catch((error) => {
+        console.error("❌ EmailJS xətası:", error);
+        this.showNotification(
+          "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.",
+          "error"
+        );
+      })
+      .finally(() => {
+        this.isSubmitting = false;
+        this.setLoadingState(false);
+      });
   }
 
   setLoadingState(loading) {
     if (!this.submitButton) return;
-
     if (loading) {
       this.submitButton.classList.add("contact-form__submit-button--loading");
       this.submitButton.disabled = true;
@@ -212,41 +244,23 @@ class ContactFormController {
 
   showNotification(message, type = "success") {
     if (!this.notification) return;
-
     this.notification.className =
       "contact-form-notification contact-form-notification--visible";
     this.notification.classList.add(`contact-form-notification--${type}`);
-
     const messageElement = this.notification.querySelector(
       ".contact-form-notification__message"
     );
     if (messageElement) messageElement.textContent = message;
-
     setTimeout(() => this.hideNotification(), 5000);
   }
 
   hideNotification() {
     this.notification?.classList.remove("contact-form-notification--visible");
   }
-
-  trackConversion(formData) {
-    if (typeof gtag !== "undefined") {
-      gtag("event", "form_submission", {
-        event_category: "Contact",
-        event_label: "Contact Form",
-        value: 1,
-      });
-    }
-
-    if (typeof fbq !== "undefined") {
-      fbq("track", "Contact");
-    }
-
-    console.log("Conversion tracked:", formData);
-  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("🚀 SGPRO Contact Form yükləndi");
   const contactForm = new ContactFormController("#contactForm");
   window.contactForm = contactForm;
 });

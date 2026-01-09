@@ -5,6 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
   <link rel="stylesheet" href="../global/config.css" />
   <link rel="stylesheet" href="../global/global.css" />
   <link rel="stylesheet" href="../global/reset.css" />
@@ -86,12 +88,11 @@
               <div class="contact-form__select-wrapper">
                 <select id="serviceInterested" name="serviceInterested" class="contact-form__select">
                   <option value="">Select a service</option>
-                  <option value="web-development">Web Development</option>
-                  <option value="mobile-app">Mobile App Development</option>
-                  <option value="ui-ux-design">UI/UX Design</option>
-                  <option value="consulting">Consulting</option>
-                  <option value="digital-marketing">Digital Marketing</option>
-                  <option value="other">Other</option>
+                  <option value="LED Screens">LED Screens & Digital Billboards</option>
+                  <option value="Outdoor Structures">Outdoor Advertising Structures</option>
+                  <option value="Branding">3D Logo & Branding Systems</option>
+                  <option value="Web Development">Web Development</option>
+                  <option value="Other">Other</option>
                 </select>
                 <svg class="contact-form__select-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2">
@@ -129,7 +130,7 @@
           </div>
         </form>
 
-        <!-- Success/Error Messages -->
+        <!-- Notification -->
         <div class="contact-form-notification" id="formNotification">
           <div class="contact-form-notification__content">
             <svg class="contact-form-notification__icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -151,113 +152,54 @@
 
     <!-- Contact Info Section -->
     <aside class="contact-info-section">
-      <div class="contact-info-section__container">
-        <!-- Email Card -->
-        <article class="contact-info-card">
-          <div class="contact-info-card__icon-wrapper contact-info-card__icon-wrapper--email">
-            <svg class="contact-info-card__icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-              <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-          </div>
-          <div class="contact-info-card__content">
-            <h3 class="contact-info-card__title">Email</h3>
-            <a href="mailto:hello@example.com" class="contact-info-card__link">hello@example.com</a>
-            <p class="contact-info-card__description">We'll respond within 24 hours</p>
-          </div>
-        </article>
+      <!-- Email Card -->
+      <article class="contact-info-card">
+        <div class="contact-info-card__icon-wrapper contact-info-card__icon-wrapper--email">
+          <svg class="contact-info-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+        </div>
+        <div class="contact-info-card__content">
+          <h3 class="contact-info-card__title">Email</h3>
+          <a href="mailto:info@sgpro.az" class="contact-info-card__link">info@sgpro.az</a>
+          <p class="contact-info-card__description">We'll respond within 24 hours</p>
+        </div>
+      </article>
 
-        <!-- Phone Card -->
-        <article class="contact-info-card">
-          <div class="contact-info-card__icon-wrapper contact-info-card__icon-wrapper--phone">
-            <svg class="contact-info-card__icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2">
-              <path
-                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-              </path>
-            </svg>
-          </div>
-          <div class="contact-info-card__content">
-            <h3 class="contact-info-card__title">Phone</h3>
-            <a href="tel:+1234567890" class="contact-info-card__link">+1 (234) 567-890</a>
-            <p class="contact-info-card__description">Mon-Fri from 8am to 5pm</p>
-          </div>
-        </article>
+      <!-- Phone Card -->
+      <article class="contact-info-card">
+        <div class="contact-info-card__icon-wrapper contact-info-card__icon-wrapper--phone">
+          <svg class="contact-info-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+            </path>
+          </svg>
+        </div>
+        <div class="contact-info-card__content">
+          <h3 class="contact-info-card__title">Phone</h3>
+          <a href="tel:+994102642323" class="contact-info-card__link">+994 10 264 23 23</a>
+          <p class="contact-info-card__description">Mon-Fri from 9am to 6pm</p>
+        </div>
+      </article>
 
-        <!-- Office Card -->
-        <article class="contact-info-card">
-          <div class="contact-info-card__icon-wrapper contact-info-card__icon-wrapper--office">
-            <svg class="contact-info-card__icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-          </div>
-          <div class="contact-info-card__content">
-            <h3 class="contact-info-card__title">Office</h3>
-            <p class="contact-info-card__link">123 Design Street</p>
-            <p class="contact-info-card__description">Creative City, CC 12345</p>
-          </div>
-        </article>
-
-        <!-- Business Hours Card -->
-        <article class="contact-info-card contact-info-card--business-hours">
-          <div class="contact-info-card__icon-wrapper contact-info-card__icon-wrapper--hours">
-            <svg class="contact-info-card__icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-          </div>
-          <div class="contact-info-card__content">
-            <h3 class="contact-info-card__title">Business Hours</h3>
-            <div class="contact-info-card__hours-list">
-              <div class="contact-info-card__hours-row">
-                <span class="contact-info-card__hours-day">Monday - Friday</span>
-                <span class="contact-info-card__hours-time">9:00 AM - 6:00 PM</span>
-              </div>
-              <div class="contact-info-card__hours-row">
-                <span class="contact-info-card__hours-day">Saturday</span>
-                <span class="contact-info-card__hours-time">10:00 AM - 4:00 PM</span>
-              </div>
-              <div class="contact-info-card__hours-row">
-                <span class="contact-info-card__hours-day">Sunday</span>
-                <span class="contact-info-card__hours-time contact-info-card__hours-time--closed">Closed</span>
-              </div>
-            </div>
-          </div>
-        </article>
-      </div>
-    </aside>
-  </div>
-
-  <!-- Map Section -->
-  <section class="contact-map-section">
-    <div class="contact-map-section__container">
-      <div class="contact-map-section__overlay">
-        <div class="contact-map-section__overlay-content">
-          <svg class="contact-map-section__overlay-icon" width="48" height="48" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2">
+      <!-- Office Card -->
+      <article class="contact-info-card">
+        <div class="contact-info-card__icon-wrapper contact-info-card__icon-wrapper--office">
+          <svg class="contact-info-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
             <circle cx="12" cy="10" r="3"></circle>
           </svg>
-          <h3 class="contact-map-section__overlay-title">Visit Our Office</h3>
-          <p class="contact-map-section__overlay-address">123 Design Street, Creative City, CC 12345</p>
-          <a href="https://maps.google.com" target="_blank" class="contact-map-section__overlay-button">
-            Get Directions
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </a>
         </div>
-      </div>
-      <div class="contact-map-section__map" id="contactMap"></div>
-    </div>
-  </section>
+        <div class="contact-info-card__content">
+          <h3 class="contact-info-card__title">Office</h3>
+          <p class="contact-info-card__link">25A Najafgulu Rafiyev St.</p>
+          <p class="contact-info-card__description">Baku, Azerbaijan</p>
+        </div>
+      </article>
+    </aside>
   </div>
-  </div>
+  <!-- END MAIN CONTENT -->
   <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-content">
